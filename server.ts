@@ -25,7 +25,7 @@ import { logger } from './src/backend/utils/logger.ts';
 import { db } from './src/backend/config/db.ts';
 import { hashPassword } from './src/backend/utils/encryption.ts';
 
-async function startServer() {
+export async function createApp() {
   const app = express();
   const PORT = 3000;
 
@@ -166,10 +166,16 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    logger.info(`Server running on http://0.0.0.0:${PORT}`);
-    logger.info(`Backend APIs available at /api/*`);
-  });
+    return app;
 }
 
-startServer();
+if (!process.env.VERCEL) {
+  createApp().then((app) => {
+    const PORT = Number(process.env.PORT) || 3000;
+
+    app.listen(PORT, '0.0.0.0', () => {
+      logger.info(`Server running on http://0.0.0.0:${PORT}`);
+      logger.info(`Backend APIs available at /api/*`);
+    });
+  });
+}
